@@ -1,0 +1,141 @@
+model:
+  # name of the model
+  name: UNet3D
+  # number of input channels to the model
+  in_channels: 1
+  # number of output channels
+  out_channels: 1
+  # determines the order of operators in a single layer (crg - Conv3d+ReLU+GroupNorm)
+  layer_order: gcr
+  # initial number of feature maps at each stage of UNet encoder
+  f_maps: [32, 64, 128, 256, 512]
+  # number of groups in the groupnorm
+  num_groups: 8
+  # apply element-wise nn.Sigmoid after the final 1x1x1 convolution, otherwise apply nn.Softmax
+  final_sigmoid: true
+  is_segmentation: true
+# loss function to be used during training
+loss:
+  # use binary cross-entropy combined with the Dice loss
+  name: BCEDiceLoss
+  # skip the last channel in the target (i.e. when last channel contains data not relevant for the loss)
+  skip_last_target: true
+optimizer:
+  # initial learning rate
+  learning_rate: 0.0001
+  # weight decay
+  weight_decay: 0.00001
+# evaluation metric
+eval_metric:
+  # use AdaptedRandError metric
+  name: BoundaryAdaptedRandError
+  # probability maps threshold
+  threshold: 0.4
+  # use the last target channel to compute the metric
+  use_last_target: true
+# learning rate scheduler configuration
+lr_scheduler:
+  # reduce learning rate when training stagnates
+  name: ReduceLROnPlateau
+  # make sure to use the 'min' mode cause lower AdaptedRandError is better
+  mode: min
+  # reduce by a factor of 5
+  factor: 0.2
+  # reduce LR if the validation metric does not improve after 'patience' number of validation runs
+  patience: 10
+trainer:
+  # model with lower eval score is considered better
+  eval_score_higher_is_better: False
+  # path to the checkpoint directory (this is where the model is saved)
+  checkpoint_dir: 'CHECKPOINT_DIR'
+  # how many iterations between validations
+  validate_after_iters: 1000
+  # how many iterations between tensorboard logging
+  log_after_iters: 500
+  # max number of epochs
+  max_num_epochs: 500
+  # max number of iterations
+  max_num_iters: 100000
+# Configure training and validation loaders
+loaders:
+  batch_size: 1
+  # how many subprocesses to use for data loading
+  num_workers: 4
+  # path to the raw data within the H5
+  raw_internal_path: raw
+  # path to the the label data withtin the H5
+  label_internal_path: label
+  # configuration of the train loader
+  train:
+    # paths to the training datasets
+    file_paths:
+      - 'TRAINING_DIR'
+
+    # SliceBuilder configuration, i.e. how to iterate over the input volume patch-by-patch
+    slice_builder:
+      name: SliceBuilder
+      patch_shape: [80, 170, 170]
+      stride_shape: [10, 20, 20]
+
+    # data augmentation pipeline
+    transformer:
+      raw:
+        - name: Standardize
+        - name: RandomFlip
+        - name: RandomRotate90
+        - name: RandomRotate
+          # rotate only in ZY plane due to anisotropy
+          axes: [[2, 1]]
+          angle_spectrum: 45
+          mode: reflect
+        - name: ElasticDeformation
+          spline_order: 3
+          execution_probability: 0.2
+        - name: GaussianBlur3D
+          execution_probability: 0.5
+        - name: AdditiveGaussianNoise
+          execution_probability: 0.2
+        - name: AdditivePoissonNoise
+          execution_probability: 0.2
+        - name: ToTensor
+          expand_dims: true
+      label:
+        - name: RandomFlip
+        - name: RandomRotate90
+        - name: RandomRotate
+          # rotate only in ZY plane due to anisotropy
+          axes: [[2, 1]]
+          angle_spectrum: 45
+          mode: reflect
+        - name: ElasticDeformation
+          spline_order: 0
+          execution_probability: 0.2
+        - name: StandardLabelToBoundary
+          # append original ground truth labels to the last channel (to be able to compute the eval metric)
+          append_label: true
+        - name: ToTensor
+          expand_dims: false
+
+  # configuration of the val loader
+  val:
+    # paths to the val datasets
+    file_paths:
+      - 'VALIDATION_DIR'
+
+    # SliceBuilder configuration, i.e. how to iterate over the input volume patch-by-patch
+    slice_builder:
+      name: SliceBuilder
+      patch_shape: [80, 170, 170]
+      stride_shape: [80, 170, 170]
+
+    # data augmentation
+    transformer:
+      raw:
+        - name: Standardize
+        - name: ToTensor
+          expand_dims: true
+      label:
+        - name: StandardLabelToBoundary
+          append_label: true
+        - name: ToTensor
+          expand_dims: false

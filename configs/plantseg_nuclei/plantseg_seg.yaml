@@ -1,0 +1,45 @@
+cnn_postprocessing:
+  factor: [1., 1., 1.]
+  order: 2
+  output_type: data_float32
+  save_raw: false
+  state: false
+  tiff: false
+cnn_prediction:
+  device: cuda
+  mirror_padding: [16, 32, 32]
+  model_name: lightsheet_unet_mouse_embryo
+  model_update: false
+  num_workers: 8
+  patch: [80, 170, 170]
+  state: false
+  stride: Accurate (slowest)
+  version: best
+path: PATH_TO_PMAPS_DIR
+preprocessing:
+  factor: [1., 1., 1.]
+  filter:
+    filter_param: 1.0
+    state: false
+    type: gaussian
+  order: '2'
+  save_directory: PreProcessing
+  state: false
+segmentation:
+  beta: 0.65
+  name: MutexWS
+  post_minsize: 1000
+  run_ws: true
+  save_directory: MutexWS
+  state: true
+  ws_2D: false
+  ws_minsize: 50
+  ws_sigma: 2.0
+  ws_threshold: 0.4
+  ws_w_sigma: 0.0
+segmentation_postprocessing:
+  factor: [1., 1., 1.]
+  order: 0
+  save_raw: true
+  state: true
+  tiff: false

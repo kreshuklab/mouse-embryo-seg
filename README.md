@@ -35,22 +35,19 @@ The pipeline for nuclei segmentation of the nuclei consists of 2-steps:
     
 ### PlantSeg's nuclei segmentation (1)
 1. Download the 3D UNet model, trained to predict the nuclei (foreground + outlines) from [here](todo)
-2. Edit the network prediction [YAML config](todo):
-    2.1 change `model_path` attribute to point to the downloaded model file
-    2.2 add the correct paths to the nuclei images (`file_paths` section of the yaml config)
-    2.3 change the `output_dir` attribute, i.e. path to the directory where the predictions will be saved
-3. Run the network prediction:
+2. Add model to PlantSeg: Create directory `~/.plantseg_models/confocal_unet_mouse_embryo_nuclei` and copy the downloaded files (`config_train.yml`, `last_checkpoint.pytorch`, `best_checkpoint.pytorch`) into it.
+3. Update `path` attribute in the plantseg's [YAML config](configs/plantseg_nuclei/plantseg_pmaps.yaml) to point to the directory containing the nuclei stained images
+4. Predict nuclei masks and outlines with PlantSeg:
 ```bash
-predict3dunet --config experiments/3dunet_nuclei_confocal/config_predict.yml
+plantseg --config configs/plantseg_nuclei/plantseg_pmaps.yaml
+``` 
+4. Assuming the nuclei stained images were in `~/embryo_nuclei` directory, extract the 2nd channel from the predictions using the script:
+```bash
+python extract_channel.py --channel 1 --input-dir ~/embryo_nuclei --output-dir ~/nuclei_boundaries
 ```
-4. Assuming the predictions were saved in `~/nuclei_predictions` directory, extract the 2nd channel from the predictions using the script:
+5. Update `path` attribute in the [YAML config](configs/plantseg_nuclei/plantseg_seg.yaml) to point to the directory containing the predicted boundaries and segment the nuclei using PlantSeg:
 ```bash
-python extract_channel.py --channel 1 --input-dir ~/nuclei_predictions --output-dir ~/nuclei_boundaries
-```
-5. Update `path` attribute in the plantseg's [YAML config](todo) to point to the `~/nuclei_boundaries` directory
-6. Segment the nuclei using PlantSeg:
-```bash
-plantseg --config CONFIG_PATH experiments/plantseg_configs/nuclei_segmentation.yml
+plantseg --config configs/plantseg_nuclei/plantseg_seg.yaml
 ```  
 The segmentation results will be saved with the hdf5 format inside the `~/nuclei_boundaries` directory.
 By default GASP agglomeration strategy with MutexWatershed linkage criteria will be used. See [A. Bailoni et al.](https://arxiv.org/abs/1906.11713) for more info.
@@ -65,10 +62,15 @@ The segmentation results will be saved in the network prediction hdf5 files as a
      
 ## Segmentation of live membrane stained images (light-sheet)
 1. Download the 3D UNet model files, trained to predict the boundaries from [here](todo)
-2. Add model to PlantSeg: Create directory `~/.plantseg_models/lightsheet_unet_mouse_embryo` and copy the downloaded files (`config_train.yml`) into it.
-3. Update `path` attribute in the plantseg's [YAML config](todo) to point to the directory containing the membrane stained images
+2. Add model to PlantSeg: Create directory `~/.plantseg_models/lightsheet_unet_mouse_embryo_membranes` and copy the downloaded files (`config_train.yml`, `last_checkpoint.pytorch`, `best_checkpoint.pytorch`) into it.
+3. Update `path` attribute in the plantseg's [YAML config](configs/plantseg_membranes/plantseg_config.yaml) to point to the directory containing the membrane stained images
 4. Segment the nuclei using PlantSeg:
 ```bash
-plantseg --config CONFIG_PATH experiments/plantseg_configs/membrane_segmentation.yml
+plantseg --config configs/plantseg_membranes/plantseg_config.yaml
 ``` 
 The segmentation results will be saved with the hdf5 format inside the image directory. 
+
+
+## Network training
+
+TODO

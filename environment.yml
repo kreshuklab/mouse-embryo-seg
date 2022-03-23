@@ -1,0 +1,15 @@
+name: embryo-seg
+
+channels:
+  - pytorch
+  - conda-forge
+  - lcerrone
+  - awolny
+
+dependencies:
+  - pytorch-3dunet 1.3.7
+  - plantseg
+  - numpy
+  - h5py
+  - scikit-image
+  - pytest
