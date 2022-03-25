@@ -1,0 +1,8 @@
+channels:
+    - pytorch
+    - conda-forge
+    - defaults
+name:
+    unet3d-mouse-embryo
+dependencies:
+    - pytorch>=1.9,<2
