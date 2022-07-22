@@ -34,7 +34,7 @@ The pipeline for nuclei segmentation of the nuclei consists of 2-steps:
     - thresholding on the 1st channel (nuclei mask) + connected components (baseline)
     
 ### PlantSeg's nuclei segmentation (1)
-1. Download the 3D UNet model, trained to predict the nuclei (foreground + outlines) from [here](todo)
+1. Download the 3D UNet model files, trained to predict the nuclei (foreground + outlines) from [here](https://oc.embl.de/index.php/s/nV10v55nbfz8kX1)
 2. Add model to PlantSeg: Create directory `~/.plantseg_models/confocal_unet_mouse_embryo_nuclei` and copy the downloaded files (`config_train.yml`, `last_checkpoint.pytorch`, `best_checkpoint.pytorch`) into it.
 3. Update `path` attribute in the plantseg's [YAML config](configs/plantseg_nuclei/plantseg_pmaps.yaml) to point to the directory containing the nuclei stained images
 4. Predict nuclei masks and outlines with PlantSeg:
@@ -61,7 +61,7 @@ python threshold_segmentation.py --pmaps ~/nuclei_predictions
 The segmentation results will be saved in the network prediction hdf5 files as a separate dataset called `cc_segmentation`.
      
 ## Segmentation of live membrane stained images (light-sheet)
-1. Download the 3D UNet model files, trained to predict the boundaries from [here](todo)
+1. Download the 3D UNet model files, trained to predict the membranes from [here](https://oc.embl.de/index.php/s/Z7XUdh67FT5N70i)
 2. Add model to PlantSeg: Create directory `~/.plantseg_models/lightsheet_unet_mouse_embryo_membranes` and copy the downloaded files (`config_train.yml`, `last_checkpoint.pytorch`, `best_checkpoint.pytorch`) into it.
 3. Update `path` attribute in the plantseg's [YAML config](configs/plantseg_membranes/plantseg_config.yaml) to point to the directory containing the membrane stained images
 4. Segment the nuclei using PlantSeg:
