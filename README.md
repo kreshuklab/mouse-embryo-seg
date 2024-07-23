@@ -72,5 +72,21 @@ The segmentation results will be saved with the hdf5 format inside the image dir
 
 
 ## Network training
+UNet models were trained with the [pytorch-3dunet](https://github.com/wolny/pytorch-3dunet) package. The data used for training can be donwloaded [here](https://doi.org/10.5281/zenodo.6546550).
 
-TODO
+## Cite
+```
+@article{https://doi.org/10.15252/embj.2022113280,
+author = {Bondarenko, Vladyslav and Nikolaev, Mikhail and Kromm, Dimitri and Belousov, Roman and Wolny, Adrian and Blotenburg, Marloes and Zeller, Peter and Rezakhani, Saba and Hugger, Johannes and Uhlmann, Virginie and Hufnagel, Lars and Kreshuk, Anna and Ellenberg, Jan and van Oudenaarden, Alexander and Erzberger, Anna and Lutolf, Matthias P and Hiiragi, Takashi},
+title = {Embryo‐uterine interaction coordinates mouse embryogenesis during implantation},
+journal = {The EMBO Journal},
+volume = {42},
+number = {17},
+pages = {e113280},
+keywords = {biophysical modeling, embryo, engineering, Implantation, uterus},
+doi = {https://doi.org/10.15252/embj.2022113280},
+url = {https://www.embopress.org/doi/abs/10.15252/embj.2022113280},
+eprint = {https://www.embopress.org/doi/pdf/10.15252/embj.2022113280},
+year = {2023}
+}
+```
